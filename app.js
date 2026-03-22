@@ -14,14 +14,45 @@ const fieldConfig = [
 const tipSets = {
   image: [
     "Lead with the subject, then place scene, style, and composition where they clarify the image instead of competing with it.",
+    "Name a specific photographer, painter, or art movement — it anchors style far faster than stacking adjectives.",
+    "Lighting sets the emotional tone before the model processes anything else. Place it early.",
     "If the prompt feels muddy, remove duplicate adjectives before adding more detail.",
     "Keep negative prompts practical and specific to visible artifacts you actually want to avoid.",
+    "A short color palette reference paired with a mood word shapes the image without overspecifying.",
+    "Composition terms like 'rule of thirds' or 'leading lines' outperform vague spatial descriptions.",
+    "Describe what fills the background — the model needs positive direction, not just what to omit.",
+    "Film grain, lens halation, or analog texture makes renders feel grounded and less synthetic.",
+    "If two style references conflict, the model splits its attention. Commit to one direction.",
+    "Faces improve when you describe the expression explicitly rather than relying on scene context.",
+    "Test composition at a square or small crop before committing to a final aspect ratio and resolution.",
   ],
   video: [
     "Describe motion as a sequence of beats so the model understands how the scene evolves over time.",
-    "Use camera language only when it improves the feeling of the shot rather than filling space.",
-    "Treat reference and transitions as control tools, not decoration.",
+    "Camera moves work best when they serve the emotion — not when they fill empty prompt space.",
+    "Anchor the scene first. Describe where it starts before you describe where it goes.",
+    "Slow motion needs both the subject's movement and the camera's position to read clearly.",
+    "Name transition types explicitly — 'smash cut', 'dissolve', and 'match cut' produce very different results.",
+    "For looping video, describe the end state mirroring the start to help the model close the loop.",
+    "Handheld camera with fast motion creates unintended blur. Add 'steady' when clarity matters.",
+    "Reference a director or film to communicate the full visual grammar you are aiming for.",
+    "Atmospheric motion — smoke, fabric, water — is more reliable than complex character choreography.",
+    "Start with a static frame description to establish scene context before introducing movement.",
+    "Use 'hold on' or 'linger on' to tell the model when to pause on a specific detail.",
+    "Treat reference consistency like a hard constraint — state it precisely rather than hoping the model infers it.",
   ],
+};
+
+const layerDescriptions = {
+  subject:     "The main character, object, or visual focus — the first thing the eye should land on.",
+  scene:       "The world around your subject: location, time of day, weather, and ambient atmosphere.",
+  style:       "The visual language — editorial, cinematic, painterly, or a specific artist's signature.",
+  composition: "How the frame is arranged: shot type, angle, depth of field, and foreground-background balance.",
+  lighting:    "The quality and direction of light, which sets the emotional temperature of the whole image.",
+  motion:      "How things move through the frame — pace, direction, energy, and rhythm of action.",
+  camera:      "The lens behavior and camera move: dolly, pan, tilt, handheld, or rack focus.",
+  transitions: "How scenes connect: cut to, dissolve, match cut, whip pan, or fade.",
+  reference:   "What must stay consistent across frames: a face, product shape, color palette, or setting.",
+  negative:    "What to exclude — specific artifacts like extra fingers, jitter, text, or motion blur.",
 };
 
 const fieldSuggestions = {
@@ -53,7 +84,6 @@ const modeButtons = document.querySelectorAll(".mode-button");
 const viewButtons = document.querySelectorAll(".view-button");
 const tipCard = document.querySelector("#tip-card");
 const tipText = document.querySelector("#tip-text");
-const tipDots = document.querySelector("#tip-dots");
 const analyzeButton = document.querySelector("#analyze-button");
 const startBuildButton = document.querySelector("#start-build-button");
 const resetTextButton = document.querySelector("#reset-text-button");
@@ -94,41 +124,36 @@ function filteredFields() {
 let tipIndex = 0;
 let tipTimer = null;
 
-function renderTipCard(index, animate) {
+const tipAccents = [
+  "subject", "scene", "style", "composition", "lighting",
+  "motion", "camera", "transitions", "reference", "negative",
+  "subject", "scene",
+];
+
+function applyTipContent(index) {
   const tips = tipSets[currentMode];
+  const accent = tipAccents[index % tipAccents.length];
+  tipText.textContent = tips[index];
+  tipCard.dataset.accent = accent;
+}
+
+function renderTipCard(index, animate) {
   if (animate) {
-    tipCard.classList.add("is-fading");
+    tipCard.classList.add("is-exiting");
     window.setTimeout(() => {
-      tipText.textContent = tips[index];
-      tipCard.classList.remove("is-fading");
-    }, 200);
+      applyTipContent(index);
+      tipCard.classList.remove("is-exiting");
+      tipCard.classList.add("is-entering");
+      window.setTimeout(() => tipCard.classList.remove("is-entering"), 400);
+    }, 280);
   } else {
-    tipText.textContent = tips[index];
+    applyTipContent(index);
   }
-  tipDots.querySelectorAll(".tip-dot").forEach((dot, i) => {
-    dot.classList.toggle("active", i === index);
-  });
 }
 
 function renderTips() {
-  const tips = tipSets[currentMode];
   tipIndex = 0;
-
-  tipDots.innerHTML = "";
-  tips.forEach((_, i) => {
-    const dot = document.createElement("button");
-    dot.className = "tip-dot" + (i === 0 ? " active" : "");
-    dot.type = "button";
-    dot.setAttribute("aria-label", `Tip ${i + 1}`);
-    dot.addEventListener("click", () => {
-      tipIndex = i;
-      renderTipCard(tipIndex, true);
-      resetTipTimer();
-    });
-    tipDots.appendChild(dot);
-  });
-
-  renderTipCard(tipIndex, false);
+  applyTipContent(tipIndex);
   resetTipTimer();
 }
 
@@ -137,7 +162,7 @@ function resetTipTimer() {
   tipTimer = window.setInterval(() => {
     tipIndex = (tipIndex + 1) % tipSets[currentMode].length;
     renderTipCard(tipIndex, true);
-  }, 4000);
+  }, 5000);
 }
 
 function updateModeUI() {
@@ -210,7 +235,7 @@ function composePlainPrompt() {
       text: (segmentState[field.key] || "").trim() || UNSPECIFIED,
     }))
     .map((segment) => `[${segment.label}: ${segment.text}]`)
-    .join(" ");
+    .join("\n");
 }
 
 function renderPlainPrompt() {
@@ -490,6 +515,39 @@ document.querySelectorAll(".preset-button").forEach((button) => {
   });
 });
 
+const legendHint = document.querySelector("#legend-hint");
+const legendItems = document.querySelectorAll(".legend li");
+let pinnedKey = null;
+
+legendItems.forEach((item) => {
+  const key = item.dataset.key;
+
+  item.addEventListener("mouseenter", () => {
+    if (!pinnedKey) {
+      legendHint.textContent = layerDescriptions[key] || "";
+      legendHint.dataset.accent = key;
+      legendHint.classList.add("is-visible");
+    }
+  });
+
+  item.addEventListener("mouseleave", () => {
+    if (!pinnedKey) legendHint.classList.remove("is-visible");
+  });
+
+  item.addEventListener("click", () => {
+    if (pinnedKey === key) {
+      pinnedKey = null;
+      legendHint.classList.remove("is-visible");
+    } else {
+      pinnedKey = key;
+      legendHint.textContent = layerDescriptions[key] || "";
+      legendHint.dataset.accent = key;
+      legendHint.classList.add("is-visible");
+    }
+    legendItems.forEach((i) => i.classList.toggle("is-pinned", i.dataset.key === pinnedKey));
+  });
+});
+
 analyzeButton.addEventListener("click", analyzePrompt);
 startBuildButton.addEventListener("click", startBlankVisualEdit);
 resetTextButton.addEventListener("click", resetToTextMode);
@@ -502,5 +560,118 @@ copyPlainButton.addEventListener("click", copyPlainPrompt);
 loadSettings();
 updateActivePreset();
 renderTips();
+
+// Seed segmentState from the default textarea before first render
+if (analyzerInput.value.trim()) {
+  segmentState = parsePromptFallback(analyzerInput.value.trim());
+}
+
 updateModeUI();
 updateViewUI();
+
+// ── Intro splash ──────────────────────────────────────────
+(function runIntro() {
+  const introScreen = document.getElementById("intro-screen");
+  const canvas = document.getElementById("intro-canvas");
+  const introTextEl = document.getElementById("intro-text");
+  if (!introScreen || !canvas) return;
+
+  const palette = [
+    [255, 138, 101],
+    [57, 208, 178],
+    [192, 132, 252],
+    [255, 190, 59],
+    [255, 95, 138],
+    [77, 185, 255],
+    [94, 140, 255],
+    [143, 209, 79],
+  ];
+
+  function explode() {
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const fontSize = Math.min(52, window.innerWidth / 13);
+
+    ctx.font = `700 ${fontSize}px "Avenir Next","Helvetica Neue","Segoe UI",sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#fff";
+    ctx.fillText("Creative Prompt Studio", cx, cy);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const particles = [];
+    const step = 3;
+
+    for (let y = Math.floor(cy - fontSize); y < Math.floor(cy + fontSize); y += step) {
+      for (let x = 0; x < canvas.width; x += step) {
+        const idx = (y * canvas.width + x) * 4;
+        if (imageData.data[idx + 3] > 100) {
+          const color = palette[Math.floor(Math.random() * palette.length)];
+          particles.push({
+            x, y,
+            vx: (Math.random() - 0.5) * 7,
+            vy: (Math.random() - 0.75) * 7,
+            color,
+            alpha: 1,
+            size: step * 0.95,
+          });
+        }
+      }
+    }
+
+    introTextEl.style.animation = "none";
+    introTextEl.style.opacity = "0";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let startTime = null;
+    const duration = 1400;
+
+    function animate(ts) {
+      if (!startTime) startTime = ts;
+      const progress = (ts - startTime) / duration;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.12;
+        p.alpha = Math.max(0, 1 - progress * 1.5);
+        if (p.alpha > 0) {
+          alive = true;
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = `rgb(${p.color[0]},${p.color[1]},${p.color[2]})`;
+          ctx.fillRect(p.x, p.y, p.size, p.size);
+        }
+      }
+
+      ctx.globalAlpha = 1;
+      if (alive) {
+        requestAnimationFrame(animate);
+      } else {
+        dismissIntro();
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  function dismissIntro() {
+    introScreen.style.transition = "opacity 0.5s ease";
+    introScreen.style.opacity = "0";
+    window.setTimeout(() => { if (introScreen.parentNode) introScreen.remove(); }, 550);
+  }
+
+  // Text fades in for ~1.5s, then explodes
+  window.setTimeout(() => {
+    try {
+      explode();
+    } catch (e) {
+      dismissIntro();
+    }
+  }, 1500);
+})();

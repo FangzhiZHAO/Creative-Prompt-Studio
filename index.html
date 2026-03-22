@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <div id="intro-screen">
+      <canvas id="intro-canvas"></canvas>
+      <div id="intro-text">Creative Prompt Studio</div>
+    </div>
+
     <div class="page-shell">
       <header class="hero panel">
         <p class="eyebrow">Creative Prompt Studio</p>
@@ -20,13 +25,12 @@
         <section class="panel">
           <div class="section-head">
             <h2>Prompt Tips</h2>
-            <p>Keep the prompt readable, intentional, and easy to rebalance.</p>
+            <p>One idea at a time, cycling through what makes prompts work.</p>
           </div>
           <div class="tips-carousel">
             <div id="tip-card" class="tip-card">
               <p id="tip-text" class="tip-text"></p>
             </div>
-            <div id="tip-dots" class="tip-dots"></div>
           </div>
         </section>
 
@@ -36,17 +40,18 @@
             <p>Each prompt layer gets its own color and editable block.</p>
           </div>
           <ul class="legend">
-            <li><span class="swatch subject"></span>Subject</li>
-            <li><span class="swatch scene"></span>Scene</li>
-            <li><span class="swatch style"></span>Style</li>
-            <li><span class="swatch composition"></span>Composition</li>
-            <li><span class="swatch lighting"></span>Lighting</li>
-            <li><span class="swatch motion"></span>Movement</li>
-            <li><span class="swatch camera"></span>Camera</li>
-            <li><span class="swatch transitions"></span>Transitions</li>
-            <li><span class="swatch reference"></span>Reference</li>
-            <li><span class="swatch negative"></span>Negative</li>
+            <li data-key="subject"><span class="swatch subject"></span>Subject</li>
+            <li data-key="scene"><span class="swatch scene"></span>Scene</li>
+            <li data-key="style"><span class="swatch style"></span>Style</li>
+            <li data-key="composition"><span class="swatch composition"></span>Composition</li>
+            <li data-key="lighting"><span class="swatch lighting"></span>Lighting</li>
+            <li data-key="motion"><span class="swatch motion"></span>Movement</li>
+            <li data-key="camera"><span class="swatch camera"></span>Camera</li>
+            <li data-key="transitions"><span class="swatch transitions"></span>Transitions</li>
+            <li data-key="reference"><span class="swatch reference"></span>Reference</li>
+            <li data-key="negative"><span class="swatch negative"></span>Negative</li>
           </ul>
+          <p id="legend-hint" class="legend-hint"></p>
         </section>
 
         <section class="panel">
@@ -57,27 +62,7 @@
 
           <div class="setup-notice">
             <span class="setup-notice-icon">⚙️</span>
-            <span>Before analyzing, configure your LLM service in <strong>LLM Settings</strong> below — choose ChatGPT or Claude and paste in your API key.</span>
-          </div>
-
-          <div class="toolbar">
-            <div class="mode-toggle" role="tablist" aria-label="Prompt mode">
-              <button class="mode-button active" data-mode="image" type="button">
-                Text to Image
-              </button>
-              <button class="mode-button" data-mode="video" type="button">
-                Text/Image to Video
-              </button>
-            </div>
-
-            <div class="view-toggle" role="tablist" aria-label="Workspace view">
-              <button class="view-button active" data-view="text" type="button">
-                Text Mode
-              </button>
-              <button class="view-button" data-view="visual" type="button">
-                Visual Mode
-              </button>
-            </div>
+            <span>Before analyzing, configure your LLM service below — choose ChatGPT or Claude and paste in your API key.</span>
           </div>
 
           <details class="settings-card">
@@ -122,6 +107,17 @@
             </p>
           </details>
 
+          <div class="mode-row">
+            <div class="mode-toggle" role="tablist" aria-label="Prompt mode">
+              <button class="mode-button active" data-mode="image" type="button">
+                Text to Image
+              </button>
+              <button class="mode-button" data-mode="video" type="button">
+                Text/Image to Video
+              </button>
+            </div>
+          </div>
+
           <div class="button-row workspace-actions">
             <button id="analyze-button" class="primary-button" type="button">
               Analyze Prompt
@@ -145,9 +141,14 @@
             <section class="work-card">
               <div class="output-head">
                 <h3>Working Canvas</h3>
-                <p id="canvas-caption" class="subtle-copy">
-                  Paste a prompt to begin.
-                </p>
+                <div class="view-toggle" role="tablist" aria-label="Workspace view">
+                  <button class="view-button active" data-view="text" type="button">
+                    Text
+                  </button>
+                  <button class="view-button" data-view="visual" type="button">
+                    Visual
+                  </button>
+                </div>
               </div>
 
               <div id="text-canvas" class="canvas-panel">
@@ -168,7 +169,7 @@
 
             <section class="work-card">
               <div class="output-head">
-                <h3>Plain Text Prompt</h3>
+                <h3>Composed Prompt</h3>
                 <button id="copy-plain" type="button" class="ghost-button">Copy</button>
               </div>
               <div
