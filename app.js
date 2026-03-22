@@ -172,6 +172,7 @@ function updateModeUI() {
     button.setAttribute("aria-selected", String(isActive));
   });
 
+  renderExampleButtons();
   renderTips();
   renderVisualEditor();
   renderPlainPrompt();
@@ -557,15 +558,69 @@ copyPlainButton.addEventListener("click", copyPlainPrompt);
   input.addEventListener("change", persistSettings);
 });
 
+const imageExamples = [
+  {
+    label: "Botanist",
+    text: "A young botanist kneeling to study a rare luminous flower, inside a sun-drenched greenhouse surrounded by towering exotic plants, wide shot from above, soft diffused lighting filtering through the glass ceiling, shallow depth of field, cinematic editorial style, warm golden tones, no text or watermarks.",
+  },
+  {
+    label: "Neon City",
+    text: "A cloaked courier frozen mid-step in a narrow alley, wet cobblestone streets below and towering city blocks rising above, wide shot from a low angle, rim lighting from overhead signs casting violet and teal streaks, cinematic film grain, muted desaturated tones, no text or watermarks.",
+  },
+  {
+    label: "Portrait",
+    text: "An elderly sculptor pausing before a half-finished stone bust, sunlit atelier studio interior, close-up portrait framing, shallow depth of field on the face, side lighting from a tall arched window, warm afternoon glow, painterly realism, muted earth tones, no text or watermarks.",
+  },
+];
+
+const videoExamples = [
+  {
+    label: "Ocean Storm",
+    text: "Ocean cliff at dusk as focal point, storm clouds drifting across the sky, dark basalt rocks below, wide shot from eye level establishing the scene, overcast diffused lighting fading to golden hour glow, slow dolly tilt-up camera move, fade to reveal first stars, moody cinematic style, heavy film grain, no text or watermarks.",
+  },
+  {
+    label: "Market Walk",
+    text: "A fashion model weaving through a crowded bazaar at golden hour, colorful market stalls and traders surrounding her, slow drifting movement through the crowd, wide establishing framing at eye level, warm side lighting from a low setting sun, handheld tracking camera following her, cut to reveal a bird's eye view from above, cinematic street photography style, film grain, no text or watermarks.",
+  },
+];
+
+function getExamplesForMode() {
+  return currentMode === "image" ? imageExamples : videoExamples;
+}
+
+function renderExampleButtons() {
+  const container = document.querySelector(".example-buttons");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const examples = getExamplesForMode();
+  examples.forEach((example, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "example-button" + (idx === 0 ? " active" : "");
+    btn.type = "button";
+    btn.dataset.example = String(idx);
+    btn.textContent = example.label;
+    btn.addEventListener("click", () => {
+      analyzerInput.value = example.text;
+      segmentState = parsePromptFallback(example.text);
+      renderVisualEditor();
+      renderPlainPrompt();
+      container.querySelectorAll(".example-button").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+    container.appendChild(btn);
+  });
+
+  // Seed the textarea and state with the first example for the current mode
+  if (examples[0]) {
+    analyzerInput.value = examples[0].text;
+    segmentState = parsePromptFallback(examples[0].text);
+  }
+}
+
 loadSettings();
 updateActivePreset();
 renderTips();
-
-// Seed segmentState from the default textarea before first render
-if (analyzerInput.value.trim()) {
-  segmentState = parsePromptFallback(analyzerInput.value.trim());
-}
-
 updateModeUI();
 updateViewUI();
 
@@ -628,7 +683,7 @@ updateViewUI();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     let startTime = null;
-    const duration = 1400;
+    const duration = 700;
 
     function animate(ts) {
       if (!startTime) startTime = ts;
@@ -666,12 +721,12 @@ updateViewUI();
     window.setTimeout(() => { if (introScreen.parentNode) introScreen.remove(); }, 550);
   }
 
-  // Text fades in for ~1.5s, then explodes
+  // Text fades in for ~0.5s, then explodes at 1s total
   window.setTimeout(() => {
     try {
       explode();
     } catch (e) {
       dismissIntro();
     }
-  }, 1500);
+  }, 600);
 })();
