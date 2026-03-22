@@ -432,6 +432,15 @@ viewButtons.forEach((button) => {
   });
 });
 
+document.querySelectorAll(".preset-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    apiEndpointInput.value = button.dataset.endpoint;
+    apiModelInput.value = button.dataset.model;
+    persistSettings();
+    apiKeyInput.focus();
+  });
+});
+
 analyzeButton.addEventListener("click", analyzePrompt);
 startBuildButton.addEventListener("click", startBlankVisualEdit);
 resetTextButton.addEventListener("click", resetToTextMode);

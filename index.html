@@ -3,16 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FZ's Prompt Studio</title>
+    <title>Creative Prompt Studio</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="page-shell">
       <header class="hero panel">
-        <p class="eyebrow">FZ's Prompt Studio</p>
-        <h1>FZ's Prompt Studio</h1>
+        <p class="eyebrow">Creative Prompt Studio</p>
+        <h1>Creative Prompt Studio</h1>
         <p class="lede">
-          Prompt like a pro artist.
+          Craft better prompts with syntax highlighting for every layer of your image or video generation.
         </p>
       </header>
 
@@ -50,6 +50,11 @@
             <p>Start in text mode, then analyze into editable highlighted parts.</p>
           </div>
 
+          <div class="setup-notice">
+            <span class="setup-notice-icon">⚙️</span>
+            <span>Before analyzing, configure your LLM service in <strong>LLM Settings</strong> below — choose ChatGPT or Claude and paste in your API key.</span>
+          </div>
+
           <div class="toolbar">
             <div class="mode-toggle" role="tablist" aria-label="Prompt mode">
               <button class="mode-button active" data-mode="image" type="button">
@@ -72,6 +77,17 @@
 
           <details class="settings-card">
             <summary>LLM Settings</summary>
+            <div class="provider-presets">
+              <span class="field-title">Quick connect</span>
+              <div class="preset-buttons">
+                <button class="preset-button" type="button" data-endpoint="https://api.openai.com/v1/chat/completions" data-model="gpt-4.1-mini">
+                  ChatGPT
+                </button>
+                <button class="preset-button" type="button" data-endpoint="https://api.anthropic.com/v1/chat/completions" data-model="claude-sonnet-4-6">
+                  Claude
+                </button>
+              </div>
+            </div>
             <div class="settings-grid">
               <label class="input-stack">
                 <span class="field-title">Endpoint</span>

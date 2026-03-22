@@ -412,6 +412,57 @@ summary:focus {
   outline-offset: 2px;
 }
 
+.setup-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: rgba(77, 185, 255, 0.08);
+  border: 1px solid rgba(77, 185, 255, 0.2);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.setup-notice strong {
+  color: var(--text);
+}
+
+.setup-notice-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.provider-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.preset-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.preset-button {
+  padding: 0.35rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 0.825rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.preset-button:hover {
+  background: rgba(77, 185, 255, 0.12);
+  border-color: rgba(77, 185, 255, 0.35);
+}
+
 @media (max-width: 860px) {
   .workspace-grid,
   .settings-grid {
