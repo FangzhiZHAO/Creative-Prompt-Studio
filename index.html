@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FZ's Prompt Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero panel">
+        <p class="eyebrow">FZ's Prompt Studio</p>
+        <h1>FZ's Prompt Studio</h1>
+        <p class="lede">
+          Prompt like a pro artist.
+        </p>
+      </header>
+
+      <main class="page-flow">
+        <section class="panel">
+          <div class="section-head">
+            <h2>Prompt Tips</h2>
+            <p>Keep the prompt readable, intentional, and easy to rebalance.</p>
+          </div>
+          <ul id="tips-list" class="tips-list"></ul>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <h2>Prompt Anatomy</h2>
+            <p>Each prompt layer gets its own color and editable block.</p>
+          </div>
+          <ul class="legend">
+            <li><span class="swatch subject"></span>Subject</li>
+            <li><span class="swatch scene"></span>Scene</li>
+            <li><span class="swatch style"></span>Style</li>
+            <li><span class="swatch composition"></span>Composition</li>
+            <li><span class="swatch lighting"></span>Lighting</li>
+            <li><span class="swatch motion"></span>Movement</li>
+            <li><span class="swatch camera"></span>Camera</li>
+            <li><span class="swatch transitions"></span>Transitions</li>
+            <li><span class="swatch reference"></span>Reference</li>
+            <li><span class="swatch negative"></span>Negative</li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <h2>Workspace</h2>
+            <p>Start in text mode, then analyze into editable highlighted parts.</p>
+          </div>
+
+          <div class="toolbar">
+            <div class="mode-toggle" role="tablist" aria-label="Prompt mode">
+              <button class="mode-button active" data-mode="image" type="button">
+                Text to Image
+              </button>
+              <button class="mode-button" data-mode="video" type="button">
+                Text/Image to Video
+              </button>
+            </div>
+
+            <div class="view-toggle" role="tablist" aria-label="Workspace view">
+              <button class="view-button active" data-view="text" type="button">
+                Text Mode
+              </button>
+              <button class="view-button" data-view="visual" type="button">
+                Visual Mode
+              </button>
+            </div>
+          </div>
+
+          <details class="settings-card">
+            <summary>LLM Settings</summary>
+            <div class="settings-grid">
+              <label class="input-stack">
+                <span class="field-title">Endpoint</span>
+                <input
+                  id="api-endpoint"
+                  type="text"
+                  value="https://api.openai.com/v1/chat/completions"
+                />
+              </label>
+
+              <label class="input-stack">
+                <span class="field-title">Model</span>
+                <input id="api-model" type="text" value="gpt-4.1-mini" />
+              </label>
+
+              <label class="input-stack input-stack-full">
+                <span class="field-title">API Key</span>
+                <input
+                  id="api-key"
+                  type="password"
+                  placeholder="Paste your API key for this session"
+                />
+              </label>
+            </div>
+            <p class="subtle-copy">
+              The prompt is sent directly from your browser to the configured endpoint.
+            </p>
+          </details>
+
+          <div class="button-row workspace-actions">
+            <button id="analyze-button" class="primary-button" type="button">
+              Analyze Prompt
+            </button>
+            <button id="start-build-button" class="ghost-button" type="button">
+              Start Blank Visual Edit
+            </button>
+            <button id="reset-text-button" class="ghost-button" type="button">
+              Back To Text Mode
+            </button>
+          </div>
+
+          <p id="analysis-status" class="status-text" aria-live="polite">
+            Paste a prompt, then analyze it.
+          </p>
+          <div id="analysis-progress" class="analysis-progress" aria-hidden="true">
+            <div class="analysis-progress-bar"></div>
+          </div>
+
+          <div class="workspace-grid">
+            <section class="work-card">
+              <div class="output-head">
+                <h3>Working Canvas</h3>
+                <p id="canvas-caption" class="subtle-copy">
+                  Paste a prompt to begin.
+                </p>
+              </div>
+
+              <div id="text-canvas" class="canvas-panel">
+                <label class="input-stack">
+                  <span class="field-title">Raw prompt</span>
+                  <textarea
+                    id="analyzer-input"
+                    rows="14"
+                    placeholder="Paste something here. It can be a short prompt or a long one with style, scene, camera, motion, and lighting details. Then hit Analyze Prompt."
+                  ></textarea>
+                </label>
+              </div>
+
+              <div id="visual-canvas" class="canvas-panel is-hidden">
+                <div id="visual-editor" class="visual-editor"></div>
+              </div>
+            </section>
+
+            <section class="work-card">
+              <div class="output-head">
+                <h3>Plain Text Prompt</h3>
+                <button id="copy-plain" type="button" class="ghost-button">Copy</button>
+              </div>
+              <div
+                id="plain-preview"
+                class="plain-preview plain-preview-rich"
+                aria-live="polite"
+              ></div>
+              <textarea id="plain-copy-buffer" class="copy-buffer" readonly></textarea>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <template id="editor-card-template">
+      <label class="editor-card">
+        <span class="token-label"></span>
+        <span class="token-suggestion"></span>
+        <textarea class="editor-input" rows="1"></textarea>
+      </label>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
