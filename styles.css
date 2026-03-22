@@ -136,6 +136,62 @@ input {
 .swatch.reference { background: var(--reference); color: var(--reference); }
 .swatch.negative { background: var(--negative); color: var(--negative); }
 
+.tips-carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.tip-card {
+  padding: 1rem 1.2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: opacity 0.2s ease;
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.tip-card.is-fading {
+  opacity: 0;
+}
+
+.tip-text {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 0.925rem;
+}
+
+.tip-dots {
+  display: flex;
+  gap: 0.45rem;
+  justify-content: center;
+}
+
+.tip-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.tip-dot.active {
+  background: var(--camera);
+  transform: scale(1.3);
+}
+
+.preset-button.active {
+  background: rgba(77, 185, 255, 0.15);
+  border-color: rgba(77, 185, 255, 0.5);
+  color: var(--camera);
+}
+
 .toolbar,
 .button-row {
   display: flex;

@@ -51,7 +51,9 @@ const fallbackRules = {
 
 const modeButtons = document.querySelectorAll(".mode-button");
 const viewButtons = document.querySelectorAll(".view-button");
-const tipsList = document.querySelector("#tips-list");
+const tipCard = document.querySelector("#tip-card");
+const tipText = document.querySelector("#tip-text");
+const tipDots = document.querySelector("#tip-dots");
 const analyzeButton = document.querySelector("#analyze-button");
 const startBuildButton = document.querySelector("#start-build-button");
 const resetTextButton = document.querySelector("#reset-text-button");
@@ -89,13 +91,53 @@ function filteredFields() {
   return fieldConfig.filter((field) => field.scope === "all" || field.scope === currentMode);
 }
 
-function renderTips() {
-  tipsList.innerHTML = "";
-  tipSets[currentMode].forEach((tip) => {
-    const item = document.createElement("li");
-    item.textContent = tip;
-    tipsList.appendChild(item);
+let tipIndex = 0;
+let tipTimer = null;
+
+function renderTipCard(index, animate) {
+  const tips = tipSets[currentMode];
+  if (animate) {
+    tipCard.classList.add("is-fading");
+    window.setTimeout(() => {
+      tipText.textContent = tips[index];
+      tipCard.classList.remove("is-fading");
+    }, 200);
+  } else {
+    tipText.textContent = tips[index];
+  }
+  tipDots.querySelectorAll(".tip-dot").forEach((dot, i) => {
+    dot.classList.toggle("active", i === index);
   });
+}
+
+function renderTips() {
+  const tips = tipSets[currentMode];
+  tipIndex = 0;
+
+  tipDots.innerHTML = "";
+  tips.forEach((_, i) => {
+    const dot = document.createElement("button");
+    dot.className = "tip-dot" + (i === 0 ? " active" : "");
+    dot.type = "button";
+    dot.setAttribute("aria-label", `Tip ${i + 1}`);
+    dot.addEventListener("click", () => {
+      tipIndex = i;
+      renderTipCard(tipIndex, true);
+      resetTipTimer();
+    });
+    tipDots.appendChild(dot);
+  });
+
+  renderTipCard(tipIndex, false);
+  resetTipTimer();
+}
+
+function resetTipTimer() {
+  if (tipTimer) window.clearInterval(tipTimer);
+  tipTimer = window.setInterval(() => {
+    tipIndex = (tipIndex + 1) % tipSets[currentMode].length;
+    renderTipCard(tipIndex, true);
+  }, 4000);
 }
 
 function updateModeUI() {
@@ -432,11 +474,18 @@ viewButtons.forEach((button) => {
   });
 });
 
+function updateActivePreset() {
+  document.querySelectorAll(".preset-button").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.endpoint === apiEndpointInput.value.trim());
+  });
+}
+
 document.querySelectorAll(".preset-button").forEach((button) => {
   button.addEventListener("click", () => {
     apiEndpointInput.value = button.dataset.endpoint;
     apiModelInput.value = button.dataset.model;
     persistSettings();
+    updateActivePreset();
     apiKeyInput.focus();
   });
 });
@@ -451,6 +500,7 @@ copyPlainButton.addEventListener("click", copyPlainPrompt);
 });
 
 loadSettings();
+updateActivePreset();
 renderTips();
 updateModeUI();
 updateViewUI();
