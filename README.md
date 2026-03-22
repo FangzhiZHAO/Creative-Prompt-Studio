@@ -1,6 +1,6 @@
-# Prompt Studio
+# Creative Prompt Studio
 
-A lightweight mini app for:
+A lightweight browser app for:
 
 - analyzing existing text-to-image or text/image-to-video prompts
 - building cleaner prompts with structured sections
@@ -12,16 +12,9 @@ A lightweight mini app for:
 - lets you move analyzed prompt parts into the builder
 - shows both a highlighted prompt view and a clean plain-text prompt
 
-## Open locally
+## Use it
 
-Open [index.html](/Users/fangzhizhao/Documents/Playground/mini-prompt-studio/index.html) in a browser.
-
-If you prefer serving it locally:
-
-```bash
-cd /Users/fangzhizhao/Documents/Playground/mini-prompt-studio
-python3 -m http.server 8000
-```
+Open the app at [fangzhizhao.github.io/Creative-Prompt-Studio](https://fangzhizhao.github.io/Creative-Prompt-Studio/) — no install needed.
 
 ## LLM setup
 
